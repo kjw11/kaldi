@@ -1,0 +1,6 @@
+#export cmd="run.pl"
+export cmd="queue.pl -q tiger.cpu.q"
+export train_cmd="queue.pl -l arch=*64* -q tiger.cpu.q"
+export iv_cmd="queue.pl -q tiger.iv.q"
+export gpu_cmd="queue.pl -q tiger.gpu.q"
+#export gpu_cmd="run.pl"
