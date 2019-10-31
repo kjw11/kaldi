@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyrigh 	2019 Tsinghua University (Author: Jiawen Kang) 
+# Copyrigh	2019 Tsinghua University (Author: Jiawen Kang) 
 #
 # This is a data preparation script for CN-Celeb database. It creats train, 
 # eval_enroll, eval_test directories for model training and evaluation. 
@@ -8,8 +8,8 @@
 
 set -e
 
-corpus_dir=$1
-dir=$2
+corpus_dir=`readlink -f $1`
+dir=`readlink -f $2`
 
 if [ $# != 2 ]; then
   echo "Usage: make_cnceleb.sh <corpus_dir> <dest_dir>"
@@ -19,32 +19,38 @@ fi
 
 cd $dir
 
-echo "creating data/{train,eval}"
-mkdir -p $dir/data/{train,eval}
+if [ ! -d $dir/data ]; then
+  echo "creating data/{train,eval}"
+  mkdir -p $dir/data/{train,eval}
+else
+  for x in train eval;do
+    echo "cleaning data/$x"
+    rm -rf $dir/data/$x/*
+  done
+fi
 
 (
 n=0
 # clean old files
-for x in train eval;do
-  echo "cleaning data/$x"
-  cd $dir/data/$x
-  rm -rf *
-done
 
 echo "preparing scp file"
-for sub in train eval; do
-  curdir=$corpus_dir/$sub
-  cd $dir/data/$sub
-  
+for sub in "CN-Celeb(E)" "CN-Celeb(T)"; do
+  curdir=$corpus_dir/${sub}
+  if [ ${sub} = "CN-Celeb(E)" ]; then
+    cd $dir/data/eval
+  else
+    cd $dir/data/train
+  fi
+
   for name in `ls $curdir | sort -u | xargs -I {} basename {}`; do
     #make id for each speaker
-    spkid=$(printf '%.3d' "$n")
+    spkid=$name
 
     for utt in `ls $curdir/$name | sort -u  | xargs -I {} basename {} .wav`; do
       sceid=`echo $utt | awk -F"-" '{print "" $1}'`
       uttid1=`echo $utt | awk -F"-" '{print "" $2}'`
       uttid2=`echo $utt | awk -F"-" '{print "" $3}'`
-      uttid=$(printf '%s_%.3d_%.3d' "$sceid" "$uttid1" "$uttid2")
+      uttid=$(printf '%s_%s_%s' "$sceid" "$uttid1" "$uttid2")
       echo ${spkid}_${uttid} $curdir/$name/$utt.wav >> wav.scp
       echo ${spkid}_${uttid} $spkid >> utt2spk
     done

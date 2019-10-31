@@ -21,8 +21,6 @@ name=cn-celeb
 scores_dir=$dest_dir/scores_$name
 trials=$dest_dir/data/eval_test/trials
 
-apply_cmvn_sliding=true
-apply_cmvn_utt=false
 lda_dim=150
 cnum=2048
 civ=400
@@ -33,7 +31,7 @@ if [ $stage -le 0 ]; then
   # data preparation
   # we make sure each speaker has at least 20s speech for enrollment,
   # and singing utterances are not included.
-  local/new_data_prep.sh $corpus_dir $dest_dir
+  local/make_cn-celeb.sh $corpus_dir $dest_dir
   datadir=$dest_dir/data
   echo "Finish data preparation."
 fi

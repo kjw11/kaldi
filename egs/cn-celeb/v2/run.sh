@@ -25,11 +25,9 @@ trials=data/eval_test/trials
 nnet_dir=exp/xvector_nnet_1a
 egs_dir=exp/xvector_nnet_1a/egs
 
-apply_cmvn_sliding=true
-apply_cmvn_utt=false
 lda_dim=150
 
-stage=0
+stage=5
 
 if [ $stage -le 0 ]; then
   # data preparation
@@ -138,9 +136,6 @@ if [ $stage -le 5 ]; then
   # extract xvector 
   for sub in train_comb eval_enroll eval_test; do
     sid/nnet3/xvector/extract_xvectors.sh --cmd "$cmd" --nj 20 \
-                          --apply-cmvn-sliding $apply_cmvn_sliding \
-                          --apply-cmvn-utt $apply_cmvn_utt \
-                          --input tdnn6.affine \
                           $nnet_dir $datadir/${sub} \
                           exp/xvectors_${name}_${sub}_tdnn6.affine
   done
@@ -161,7 +156,7 @@ if [ $stage -le 6 ]; then
   local/cosine_scoring.sh $datadir/eval_enroll $datadir/eval_test \
                          exp/xvectors_${name}_eval_enroll_tdnn6.affine \
                          exp/xvectors_${name}_eval_test_tdnn6.affine \
-                         $datadir/eval_test/trials $scores_dir
+                         $trials $scores_dir
 
   cosine_eer=$(paste $trials $scores_dir/cosine_scores | awk '{print $6, $3}' | compute-eer - 2>/dev/null)
   echo "CosineEER: $cosine_eer%"
