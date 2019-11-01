@@ -2,6 +2,7 @@
 # --coding: utf-8 —**
 #
 # Copyright 2019	Tsinghua University (Author: Jiawen Kang)
+# Apache 2.0.
 #
 # This script is used for CN-Celeb database. It randomly selects 
 # 20s audio for each speaker as enrollment utterances and skip 

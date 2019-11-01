@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Copyright	2019 Tsinghua University (Author: Jiawen Kang)
+# Apache 2.0.
 #
 # This script is called by ../run.sh, it is a outer script for
 # subdata_by_dur.py and the do_filtering function is borrowed
@@ -9,6 +10,8 @@ set -e
 
 srcdir=$1
 destdir=$2
+
+echo "$0 $@"
 
 function do_filtering {
   # assumes the utt2spk and spk2utt files already exist.
