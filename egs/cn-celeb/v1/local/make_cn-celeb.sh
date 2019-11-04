@@ -11,10 +11,10 @@ set -e
 
 train_list=local/train_id_list
 eval_list=local/eval_id_list
-random_enroll=false
+random_enroll=true
 
 # config n_job, to make this script run in parallel
-nj=10
+nj=20
 tmp_fifofile="/tmp/$$.fifo" #pipeline file
 mkfifo "$tmp_fifofile"
 
@@ -60,8 +60,10 @@ fi
 for list in `readlink -f $train_list` `readlink -f $eval_list`; do
   if [[ $list =~ train ]]; then
     cd $dir/data/train
+    echo "preparing training files"
   else
     cd $dir/data/eval
+    echo "preparing evaluaion files"
   fi
   
   # associate descriptor 6 and pipeline file

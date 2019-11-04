@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2015   David Snyder
+# Copyright 2018   Lantian Li
 # Apache 2.0.
 #
 # This script trains LDA-PLDA models and does scoring.
@@ -18,7 +19,7 @@ if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
 
 if [ $# != 8 ]; then
-  echo "Usage: $0 <plda-data-dir> <enroll-data-dir> <test-data-dir> <plda-ivec-dir> <enroll-ivec-dir> <test-ivec-dir> <trials-file> <scores-dir>"
+  echo "Usage: $0 <plda-data-dir> <enroll-data-dir> <test-data-dir> <plda-xvec-dir> <enroll-xvec-dir> <test-xvec-dir> <trials-file> <scores-dir>"
 fi
 
 plda_data_dir=$1
@@ -39,19 +40,15 @@ else
     ivector-mean scp:$plda_xvec_dir/xvector.scp \
     $plda_xvec_dir/mean.vec || exit 1;
 
-  if [ ! -f $plda_xvec_dir/transform_lda.mat ]; then
-    run.pl $plda_xvec_dir/log/lda.log \
-      ivector-compute-lda --total-covariance-factor=$covar_factor --dim=$lda_dim \
-      "ark:ivector-subtract-global-mean scp:$plda_xvec_dir/xvector.scp ark:- |" \
-      ark:$plda_data_dir/utt2spk $plda_xvec_dir/transform_lda.mat || exit 1;
-  fi
+  run.pl $plda_xvec_dir/log/lda.log \
+    ivector-compute-lda --total-covariance-factor=$covar_factor --dim=$lda_dim \
+    "ark:ivector-subtract-global-mean scp:$plda_xvec_dir/xvector.scp ark:- |" \
+    ark:$plda_data_dir/utt2spk $plda_xvec_dir/transform_lda.mat || exit 1;
 
-  if [ ! -f $plda_xvec_dir/lda_plda ]; then
-    run.pl $plda_xvec_dir/log/lda_plda.log \
-      ivector-compute-plda ark:$plda_data_dir/spk2utt \
-      "ark:ivector-subtract-global-mean scp:$plda_xvec_dir/xvector.scp ark:- | transform-vec $plda_xvec_dir/transform_lda.mat ark:- ark:- | ivector-normalize-length ark:- ark:- |" \
-      $plda_xvec_dir/lda_plda || exit 1;
-  fi
+  run.pl $plda_xvec_dir/log/lda_plda.log \
+    ivector-compute-plda ark:$plda_data_dir/spk2utt \
+    "ark:ivector-subtract-global-mean scp:$plda_xvec_dir/xvector.scp ark:- | transform-vec $plda_xvec_dir/transform_lda.mat ark:- ark:- | ivector-normalize-length ark:- ark:- |" \
+    $plda_xvec_dir/lda_plda || exit 1;
 fi
 
 mkdir -p $scores_dir/log

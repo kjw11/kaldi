@@ -142,21 +142,20 @@ if [ $stage -le 5 ]; then
     sid/nnet3/xvector/extract_xvectors.sh --cmd "$cmd" --nj 20 \
                           $nnet_dir $datadir/${sub} \
                           exp/xvectors_${sub}_tdnn6.affine
+
   done
 fi
- 
-if [ $stage -le 6 ]; then 
-  # LDA_PLDA scoring
-  local/lda_plda_scoring.sh --lda-dim $lda_dim --covar-factor 0.0 \
-                         $datadir/train_comb $datadir/eval_enroll \
-                         $datadir/eval_test exp/xvectors_train_comb_tdnn6.affine \
-                         exp/xvectors_eval_enroll_tdnn6.affine \
-                         exp/xvectors_eval_test_tdnn6.affine $trials \
-                         $scores_dir
-  # Calculate EER 
-  eer=$(paste $trials ${scores_dir}/lda_plda_scores | awk '{print $6, $3}' | compute-eer - 2>/dev/null)
-  echo " LDA_PLDA EER= $eer%"  
-fi
 
-
+if [ $stage -le 6 ]; then
+  #Scores:
+  #Cosine EER: 20.58%
+  #LDA EER: 15.81%
+  #PLDA EER: 16.24%
+  #LDA_PLDA EER: 13.62%
+  #PCA_PLDA EER: 12.72%
+  local/evaluation.sh $datadir/train_comb exp/xvectors_train_comb_tdnn6.affine \
+                       $datadir/eval_enroll exp/xvectors_eval_enroll_tdnn6.affine \
+                       $datadir/eval_test exp/xvectors_eval_test_tdnn6.affine \
+                       $trials $scores_dir
+fi 
 

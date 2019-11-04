@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2015   David Snyder
+# Copyright 2018   Lantian Li
 # Apache 2.0.
 #
 # This script does cosine scoring.

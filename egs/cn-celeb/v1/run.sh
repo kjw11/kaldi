@@ -109,17 +109,14 @@ if [ $stage -le 6 ]; then
 fi
 
 if [ $stage -le 7 ]; then
-  # Grain plda with conbined training data, and get LDA_PLDA scores.
-  local/lda_plda_scoring.sh --lda-dim $lda_dim --covar-factor 0.0\
-                         $datadir/train_comb $datadir/eval_enroll \
-                         $datadir/eval_test exp/ivectors_train_comb \
-                         exp/ivectors_eval_enroll \
-                         exp/ivectors_eval_test $trials $scores_dir
-  # Calculate EER:
-  eer=$(paste $trials ${scores_dir}/lda_plda_scores | awk '{print $6, $3}' | compute-eer - 2>/dev/null)
-  echo " LDA_PLDA EER= $eer%"
+  #Scores:
+  #Cosine EER: 17.79%
+  #LDA EER: 14.59%
+  #PLDA EER: 12.72%
+  #LDA_PLDA EER: 13.76%
+  #PCA_PLDA EER: 14.27%
+  local/evaluation.sh $datadir/train_comb exp/ivectors_train_comb \
+                       $datadir/eval_enroll exp/ivectors_eval_enroll \
+                       $datadir/eval_test exp/ivectors_eval_test \
+                       $trials $scores_dir 
 fi
-
-
-
-
