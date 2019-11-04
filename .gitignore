@@ -1,5 +1,6 @@
 # Compiled extensionless executable files in /src/*/
 # This stanza must precede wildcard patterns below!
+/src/run_config.sh
 /src/*/*
 !/src/lm/test_data/
 !/src/*/?*.*
